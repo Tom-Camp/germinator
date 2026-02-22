@@ -1,0 +1,34 @@
+version = 1
+revision = 3
+requires-python = ">=3.14"
+
+[[package]]
+name = "germinator"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "micropython-rp2-rpi-pico2-w-stubs" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "micropython-rp2-rpi-pico2-w-stubs", specifier = ">=1.27.0.post1" }]
+
+[[package]]
+name = "micropython-rp2-rpi-pico2-w-stubs"
+version = "1.27.0.post1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "micropython-stdlib-stubs" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/da/c5/83c8ac769f8c511f62de55e24410d6ed4344d959ebe7f84029e491516aca/micropython_rp2_rpi_pico2_w_stubs-1.27.0.post1.tar.gz", hash = "sha256:53f6f31bdf68912b6b87ec0439e1b8ac864c6a5fe70dd307b4c44b515f945937", size = 96674, upload-time = "2025-12-18T16:11:33.816Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/83/90/d330d7c8c263e47588359024bc535840fa2cbe7c244dbbe22d59386eede9/micropython_rp2_rpi_pico2_w_stubs-1.27.0.post1-py2.py3-none-any.whl", hash = "sha256:a2b11cee3c2fcc734d31f7c1f0d3de840cf832bc3953c38bee8dc900d00a7226", size = 125603, upload-time = "2025-12-18T16:11:32.761Z" },
+]
+
+[[package]]
+name = "micropython-stdlib-stubs"
+version = "1.27.0.post1"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/5a/03/a618155f2be2544ea68790e18c3dbfb845e2f3b6f867248e4a8ac6df8f43/micropython_stdlib_stubs-1.27.0.post1-py3-none-any.whl", hash = "sha256:712296e551ab60e956e46175e952088a354351c41b0ab18a77c26511e5fcbf62", size = 147530, upload-time = "2026-02-15T22:19:23.901Z" },
+]
