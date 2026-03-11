@@ -11,29 +11,28 @@ class Requester:
         self.base_url = secrets.API_URL
         self.headers: dict = {
             "Content-Type": "application/json",
-            "X-API-KEY": secrets.API_KEY,
+            "X-API-Key": secrets.API_KEY,
+            "X-Device-Id": secrets.DEVICE_ID,
         }
-        self.data: dict = {}
-        self.url: str = ""
+        self.data: str | None = None
 
     def headers(self, headers: dict):
         self.headers.update(headers)
 
     def post(self, path: str, data: dict) -> dict | None:
-        self.url = f"{self.base_url}/{path}"
+        url = f"{self.base_url}/{path}"
         self.data = json.dumps(data)
-        return self.__make_request(method="POST")
+        return self.__make_request(method="POST", url=url)
 
     def get(self, path: str) -> dict | None:
-        self.url = f"{self.base_url}/{path}"
-        return self.__make_request()
+        url = f"{self.base_url}/{path}"
+        return self.__make_request(url=url)
 
-    def __make_request(self, method: str = "GET"):
+    def __make_request(self, url: str, method: str = "GET"):
         response = None
-        return_value: dict = {}
         try:
             response = requests.request(
-                method, self.url,
+                method, url,
                 headers=self.headers,
                 data=self.data,
                 timeout=10,
@@ -60,4 +59,4 @@ class Requester:
             if response:
                 response.close()
                 gc.collect()
-            return return_value
+        return return_value

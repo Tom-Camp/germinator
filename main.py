@@ -11,22 +11,20 @@ from lib.lighting import Lighting
 from lib.requester import Requester
 from lib.stemma_soil_sensor import StemmaSoilSensor
 from lib.germination import phases, color
-from secrets import DEVICE_ID
 
 wifi = Connect(
     ssid=secrets.SSID,
     password=secrets.PASSWORD,
     hostname=secrets.HOSTNAME,
 )
-ok, reason = wifi.connect()
-if not ok:
-    raise RuntimeError('wifi connect failed: ' + reason)
+wifi.connect()
 
 lights = Lighting(count=secrets.PIXEL_COUNT, pin=secrets.LIGHT_PIN)
 air_i2c = I2C(secrets.I2C_ID, sda=Pin(secrets.SDA_PIN), scl=Pin(secrets.SCL_PIN), freq=20000)
 soil_i2c = I2C(secrets.I2C_ID, sda=Pin(secrets.SDA_PIN), scl=Pin(secrets.SCL_PIN), freq=20000)
 phase_key: str = "germination"
 tzo = 4
+requester = Requester()
 
 gc.enable()
 
@@ -68,6 +66,7 @@ def soil() -> dict:
         soil_sensor_data = {"error": str(er)}
     finally:
         pass
+
     return soil_sensor_data
 
 
@@ -89,15 +88,21 @@ while True:
         soil_data = soil()
         run_lights()
         data: dict = {
-            "device_id": DEVICE_ID,
-            "data": {
-                "air": air_data,
-                "soil": soil_data,
-                "lights": lights.status,
-            }
+            "air": air_data,
+            "soil": soil_data,
+            "lights": lights.status,
         }
-        response = Requester().post(path="data", data=data)
-        current_phase = response.get("data").get("notes").get("phase", "germination")
+
+        post_path = "data/"
+        _ = requester.post(path=post_path, data=data)
+
+        get_path = f"devices/{secrets.DEVICE_ID}"
+        response = requester.get(path=get_path)
+        response_data = response.get("data", {})
+        notes = response_data.get("notes", {})
+        current_phase = notes.get("phase", "germination")
+
+        phase_key = current_phase if current_phase != phase_key else phase_key
         phase_key = current_phase if current_phase != phase_key else phase_key
     except KeyboardInterrupt:
         print('Interrupted')

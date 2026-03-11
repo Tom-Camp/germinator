@@ -1,11 +1,16 @@
 import requests
+import secrets
 
 
 class Requester:
 
     def __init__(self, url: str):
         self.base_url = url
-        self.headers: dict = {"Content-Type": "application/json"}
+        self.headers: dict = {
+            "Content-Type": "application/json",
+            "X-API-KEY": secrets.API_KEY,
+            "X-Device-Id": secrets.DEVICE_ID,
+        }
         self.kwargs: dict = {}
         self.url: str = ""
 
