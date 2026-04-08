@@ -24,6 +24,8 @@ air_i2c = I2C(secrets.I2C_ID, sda=Pin(secrets.SDA_PIN), scl=Pin(secrets.SCL_PIN)
 soil_i2c = I2C(secrets.I2C_ID, sda=Pin(secrets.SDA_PIN), scl=Pin(secrets.SCL_PIN), freq=20000)
 phase_key: str = "germination"
 tzo = 4
+ROW_COUNT = 8
+ROW_SIZE = 32
 requester = Requester()
 
 gc.enable()
@@ -73,11 +75,22 @@ def soil() -> dict:
 def run_lights():
     phase_data = phases.get(phase_key)
     hours = phase_data.get("duration")
-    current = time.localtime()[3]
-    tz_offset = tzo if current > 3 else 23 - (tzo - current)
-    if hours[0] <= current - tz_offset <= hours[1]:
-        if not lights.status:
-            lights.turn_on_all(profile=color)
+    start_hour = hours[0]
+    end_hour = hours[1]
+
+    t = time.localtime()
+    adjusted_hour = (t[3] - tzo) % 24
+    current_decimal = adjusted_hour + t[4] / 60.0
+
+    noon = (start_hour + end_hour) / 2.0
+
+    if start_hour <= current_decimal <= end_hour:
+        if current_decimal <= noon:
+            progress = (current_decimal - start_hour) / (noon - start_hour)
+        else:
+            progress = (end_hour - current_decimal) / (end_hour - noon)
+        rows_lit = max(1, min(ROW_COUNT, round(progress * ROW_COUNT)))
+        lights.sun_position(rows_lit, ROW_SIZE, profile=color)
     else:
         lights.turn_off()
 
